@@ -1,3 +1,3 @@
-# Zerodash server
+# Zerodash
 
-Server for zerodash
+Zerodash, The only task management app you'll ever need

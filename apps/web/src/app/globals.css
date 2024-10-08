@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f5f5;
+    --color-background-inverse: #000000;
+    --color-foreground-primary: #000000;
+    --color-foreground-secondary: #212121;
+    --color-foreground-inverse: #ffffff;
+    --color-primary: #fb8500;
+    --color-secondary: #ffac4c;
+  }
+}
+
+.flex-center {
+  @apply flex justify-center items-center;
+}

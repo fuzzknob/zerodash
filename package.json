@@ -1,0 +1,9 @@
+{
+  "name": "zerodash",
+  "version": "0.0.0",
+  "private": "true",
+  "scripts": {
+    "web-dev": "pnpm --filter zerodash-web dev",
+    "server-start": "cargo run -p zerodash-server"
+  }
+}
