@@ -4,6 +4,7 @@
   "private": "true",
   "scripts": {
     "web-dev": "pnpm --filter zerodash-web dev",
+    "server-dev": "cargo watch -x 'run -- -p zerodash-server'",
     "server-start": "cargo run -p zerodash-server"
   }
 }
