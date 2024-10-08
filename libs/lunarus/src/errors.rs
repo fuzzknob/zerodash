@@ -1,9 +1,12 @@
-use crate::lunar::prelude::{IntoResponse, Response};
-use axum::{http::StatusCode, Json};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use serde_json::json;
 
 #[derive(thiserror::Error, Debug)]
-pub enum LunarError {
+pub enum Error {
     #[error("Not Found")]
     NotFound,
 
@@ -42,7 +45,7 @@ pub enum LunarError {
 
     #[error("std error")]
     IOError(#[from] std::io::Error),
-    
+
     #[error(transparent)]
     DbError(#[from] surrealdb::Error),
 
@@ -50,10 +53,10 @@ pub enum LunarError {
     Any(#[from] Box<dyn std::error::Error>),
 }
 
-impl IntoResponse for LunarError {
+impl IntoResponse for Error {
     fn into_response(self) -> Response {
         let (status_code, message) = match self {
-            LunarError::NotFound => (StatusCode::NOT_FOUND, self.to_string()),
+            Error::NotFound => (StatusCode::NOT_FOUND, self.to_string()),
             _ => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
         };
         (status_code, Json(json!({ "message": message }))).into_response()

@@ -1,14 +1,15 @@
-use super::{context::AppContext, database::initialize_database, utils::get_env, Result};
-use crate::lunar::errors::LunarError;
+use crate::{
+    context::AppContext, database::initialize_database, errors::Error, utils::get_env, Result,
+};
 use axum::{extract::Request, Router, ServiceExt};
 use tower_http::{normalize_path::NormalizePath, trace};
 
 #[derive(Debug, Clone)]
-pub struct LunarApp {
+pub struct LunarusApp {
     context: AppContext,
 }
 
-impl LunarApp {
+impl LunarusApp {
     pub async fn init() -> Result<Self> {
         initialize_environment()?;
         initialize_tracing()?;
@@ -24,7 +25,7 @@ impl LunarApp {
         let server_full_url = format!("{server_address}:{server_port}");
         let listener = tokio::net::TcpListener::bind(&server_full_url)
             .await
-            .map_err(|_| LunarError::TCPBindingError)?;
+            .map_err(|_| Error::TCPBindingError)?;
         let router = install_layers(router.with_state(self.context));
         let app = NormalizePath::trim_trailing_slash(router);
         tracing::info!("started server at {server_full_url}");
@@ -34,7 +35,7 @@ impl LunarApp {
 }
 
 fn initialize_environment() -> Result<()> {
-    dotenvy::dotenv().map_err(|_| LunarError::EnvironmentInitializationError)?;
+    dotenvy::dotenv().map_err(|_| Error::EnvironmentInitializationError)?;
     Ok(())
 }
 
@@ -44,7 +45,7 @@ fn initialize_tracing() -> Result<()> {
         .with_line_number(false)
         .finish();
     tracing::subscriber::set_global_default(lunar_tracing)
-        .map_err(|_| LunarError::TracingInitializationError)
+        .map_err(|_| Error::TracingInitializationError)
 }
 
 fn install_layers(router: Router) -> Router {

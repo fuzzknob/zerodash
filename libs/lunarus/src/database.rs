@@ -1,4 +1,4 @@
-use super::{errors::LunarError, utils::get_required_env, Result};
+use super::{errors::Error, utils::get_required_env, Result};
 
 use surrealdb::{
     engine::remote::ws::{Client, Ws},
@@ -15,16 +15,16 @@ pub async fn initialize_database() -> Result<Surreal<Client>> {
     let database_password = get_required_env("DATABASE_PASSWORD");
     let db = Surreal::new::<Ws>(&database_url)
         .await
-        .map_err(|_| LunarError::DatabaseConnectionError)?;
+        .map_err(|_| Error::DatabaseConnectionError)?;
     db.signin(Root {
         username: &database_user,
         password: &database_password,
     })
     .await
-    .map_err(|_| LunarError::DatabaseCredentialError)?;
+    .map_err(|_| Error::DatabaseCredentialError)?;
     db.use_ns(&database_name)
         .use_db(database_name)
         .await
-        .map_err(|_| LunarError::DatabaseInitializationError)?;
+        .map_err(|_| Error::DatabaseInitializationError)?;
     Ok(db)
 }

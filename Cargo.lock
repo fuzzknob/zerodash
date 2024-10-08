@@ -1632,6 +1632,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
+name = "lunarus"
+version = "0.0.0"
+dependencies = [
+ "axum",
+ "bytes",
+ "colored",
+ "dotenvy",
+ "serde",
+ "serde_json",
+ "surrealdb",
+ "thiserror",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "mac"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3032,7 +3050,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3938,7 +3956,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4197,17 +4215,11 @@ name = "zerodash-server"
 version = "0.0.0"
 dependencies = [
  "axum",
- "bytes",
- "colored",
- "dotenvy",
+ "lunarus",
  "serde",
  "serde_json",
- "surrealdb",
- "thiserror",
  "tokio",
- "tower-http",
  "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
