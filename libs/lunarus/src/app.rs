@@ -1,5 +1,6 @@
 use crate::{
-    context::AppContext, database::initialize_database, errors::Error, utils::get_env, Result,
+    context::AppContext, database::initialize_database, errors::Error, prelude::run_migrations,
+    utils::get_env, Result,
 };
 use axum::{extract::Request, Router, ServiceExt};
 use tower_http::{normalize_path::NormalizePath, trace};
@@ -14,6 +15,7 @@ impl LunarusApp {
         initialize_environment()?;
         initialize_tracing()?;
         let db = initialize_database().await?;
+        run_migrations(&db).await?;
         Ok(Self {
             context: AppContext { db },
         })
