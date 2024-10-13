@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-axum = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
 tokio = { workspace = true, features = ["net"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
@@ -13,6 +13,7 @@ tracing = { workspace = true }
 thiserror = { workspace = true }
 tracing-subscriber = { workspace = true }
 surrealdb = { workspace = true }
+validator = { workspace = true, features = ["derive"] }
 tower-http = { version = "0.6.1", features = ["normalize-path", "trace"] }
 bytes = "1.7.2"
 colored = "2.1.0"

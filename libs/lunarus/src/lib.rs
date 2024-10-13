@@ -7,5 +7,6 @@ pub mod errors;
 pub mod prelude;
 pub mod res;
 pub mod utils;
+pub mod validator;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;

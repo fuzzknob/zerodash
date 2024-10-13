@@ -6,6 +6,7 @@ use axum::{
 };
 use bytes::{BufMut, BytesMut};
 use serde::Serialize;
+use serde_json::json;
 
 pub fn text(content: &str) -> Result<impl IntoResponse> {
     Ok(content.to_string())
@@ -17,6 +18,10 @@ pub fn html(content: &str) -> Result<impl IntoResponse> {
 
 pub fn json<T: Serialize>(content: T) -> Result<impl IntoResponse> {
     Ok(Json(content))
+}
+
+pub fn message(message: &str) -> Result<impl IntoResponse> {
+    builder().message(message)
 }
 
 pub fn redirect(to: &str) -> Result<impl IntoResponse> {
@@ -45,9 +50,7 @@ impl ResponseBuilder {
         }
     }
 
-
-    pub fn header(self, key: &str, value: &str) -> Self
-    {
+    pub fn header(self, key: &str, value: &str) -> Self {
         Self {
             response: self.response.header(key, value),
         }
@@ -61,6 +64,10 @@ impl ResponseBuilder {
             .response
             .header("content-type", "application/json")
             .body(body)?)
+    }
+
+    pub fn message(self, message: &str) -> Result<impl IntoResponse> {
+        self.json(json!({ "message": message }))
     }
 }
 

@@ -1,4 +1,4 @@
--- ------------------------------
+ ------------------------------
 -- TABLE: tasks
 -- ------------------------------
 DEFINE TABLE OVERWRITE tasks TYPE NORMAL SCHEMALESS
