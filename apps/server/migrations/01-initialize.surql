@@ -25,6 +25,30 @@ DEFINE FIELD updated_at ON users TYPE datetime VALUE time::now()
 DEFINE INDEX OVERWRITE usernameIndex ON TABLE users FIELDS username UNIQUE;
 DEFINE INDEX OVERWRITE emailIndex ON TABLE users FIELDS email UNIQUE;
 
+
+---------------------------------
+-- TABLE: sessions
+---------------------------------
+DEFINE TABLE OVERWRITE sessions TYPE NORMAL SCHEMALESS
+	PERMISSIONS NONE
+;
+DEFINE FIELD token ON sessions TYPE string
+	PERMISSIONS FULL
+;
+DEFINE FIELD user ON sessions TYPE record<users>
+	PERMISSIONS FULL
+;
+DEFINE FIELD expiration ON sessions TYPE datetime DEFAULT time::now()
+	PERMISSIONS FULL
+;
+DEFINE FIELD created_at ON sessions TYPE datetime DEFAULT time::now()
+	PERMISSIONS FULL
+;
+DEFINE FIELD updated_at ON sessions TYPE datetime VALUE time::now()
+	PERMISSIONS FULL
+;
+DEFINE INDEX OVERWRITE tokenIndex ON TABLE sessions FIELDS token UNIQUE;
+
 ---------------------------------
 -- TABLE: tasks
 ---------------------------------

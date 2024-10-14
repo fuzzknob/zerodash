@@ -29,6 +29,12 @@ impl Serialize for Id {
     }
 }
 
+impl ToString for Id {
+    fn to_string(&self) -> String {
+        self.id.to_string()
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Record {
     pub id: Id,

@@ -1,7 +1,9 @@
-use super::auth_dto::RegisterDTO;
+use super::auth_dto::{LoginDTO, RegisterDTO};
 use super::auth_model::{AuthModel, AUTH_TABLE_NAME};
-use crate::utils::hash;
+use super::session_model::{SessionModel, SESSION_TABLE_NAME};
+use crate::utils::{self, hash};
 use lunarus::prelude::*;
+use surrealdb::sql::Datetime;
 
 pub struct AuthService {
     db: Db,
@@ -36,6 +38,51 @@ impl AuthService {
             .await?;
         Ok(RegisterResult::Ok(user.unwrap()))
     }
+
+    pub async fn login(&self, credential: LoginDTO) -> Result<LoginResult> {
+        let user: Option<AuthModel> = if utils::is_email(&credential.identity) {
+            let mut result = self
+                .db
+                .query("SELECT * FROM type::table($table) WHERE email = $email")
+                .bind(("table", AUTH_TABLE_NAME))
+                .bind(("email", credential.identity))
+                .await?;
+            result.take(0)?
+        } else {
+            let mut result = self
+                .db
+                .query("SELECT * FROM type::table($table) WHERE username = $username")
+                .bind(("table", AUTH_TABLE_NAME))
+                .bind(("username", credential.identity))
+                .await?;
+            result.take(0)?
+        };
+        let user = match user {
+            Some(user) => user,
+            None => return Ok(LoginResult::UserNotFound),
+        };
+        let is_password_valid = hash::verify_password(&credential.password, &user.password);
+        if !is_password_valid {
+            return Ok(LoginResult::InvalidCredentials);
+        }
+        let expiration = chrono::Utc::now() + chrono::Duration::days(30);
+        let session: Option<SessionModel> = self
+            .db
+            .query("CREATE type::table($table) set token = type::string($session_token), user = type::thing($user_id), expiration = $expiration")
+            .bind(("table", SESSION_TABLE_NAME))
+            .bind(("session_token", hash::get_unique_random_hash()))
+            .bind(("user_id", format!("{}:{}", AUTH_TABLE_NAME, user.id.to_string())))
+            .bind(("expiration", Datetime::from(expiration)))
+            .await?
+            .take(0)?;
+        Ok(LoginResult::Ok(session.unwrap()))
+    }
+}
+
+pub enum LoginResult {
+    Ok(SessionModel),
+    UserNotFound,
+    InvalidCredentials,
 }
 
 pub enum RegisterResult {

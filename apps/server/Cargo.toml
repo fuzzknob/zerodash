@@ -13,4 +13,7 @@ lunarus = { workspace = true }
 validator = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 surrealdb = { workspace = true }
+chrono = { workspace = true }
 argon2 = { version = "0.5.3" }
+regex = "1.11.0"
+uuid = { version = "1.10.0", features = ["v4", "fast-rng"] }
