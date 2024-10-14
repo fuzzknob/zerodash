@@ -29,6 +29,11 @@ impl Serialize for Id {
     }
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Record {
+    pub id: Id,
+}
+
 pub async fn initialize_database() -> Result<Db> {
     tracing::info!("Initializing database");
     let database_url = get_required_env("DATABASE_URL");
