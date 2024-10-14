@@ -11,3 +11,6 @@ serde_json = { workspace = true }
 tracing = { workspace = true }
 lunarus = { workspace = true }
 validator = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+surrealdb = { workspace = true }
+argon2 = { version = "0.5.3" }

@@ -1648,7 +1648,6 @@ name = "lunarus"
 version = "0.0.0"
 dependencies = [
  "axum",
- "bytes",
  "colored",
  "dotenvy",
  "serde",
@@ -4258,10 +4257,13 @@ dependencies = [
 name = "zerodash-server"
 version = "0.0.0"
 dependencies = [
+ "argon2",
  "axum",
  "lunarus",
  "serde",
  "serde_json",
+ "surrealdb",
+ "thiserror",
  "tokio",
  "tracing",
  "validator",
