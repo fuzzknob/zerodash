@@ -4,7 +4,6 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
     Json,
 };
-use bytes::{BufMut, BytesMut};
 use serde::Serialize;
 use serde_json::json;
 
@@ -57,9 +56,7 @@ impl ResponseBuilder {
     }
 
     pub fn json<T: Serialize>(self, content: T) -> Result<impl IntoResponse> {
-        let mut buf = BytesMut::with_capacity(128).writer();
-        serde_json::to_writer(&mut buf, &content)?;
-        let body = axum::body::Body::from(buf.into_inner().freeze());
+        let body = serde_json::to_string(&content).unwrap();
         Ok(self
             .response
             .header("content-type", "application/json")
