@@ -1,30 +1,29 @@
 use super::Result;
 use axum::{
     http,
-    response::{Html, IntoResponse, Redirect},
-    Json,
+    response::{Html, IntoResponse, Redirect, Response},
 };
 use serde::Serialize;
 use serde_json::json;
 
-pub fn text(content: &str) -> Result<impl IntoResponse> {
-    Ok(content.to_string())
+pub fn text(content: &str) -> Result<Response> {
+    Ok(content.to_string().into_response())
 }
 
-pub fn html(content: &str) -> Result<impl IntoResponse> {
-    Ok(Html(content.to_string()))
+pub fn html(content: &str) -> Result<Response> {
+    Ok(Html(content.to_string()).into_response())
 }
 
-pub fn json<T: Serialize>(content: T) -> Result<impl IntoResponse> {
-    Ok(Json(content))
+pub fn json<T: Serialize>(content: T) -> Result<Response> {
+    builder().json(content)
 }
 
-pub fn message(message: &str) -> Result<impl IntoResponse> {
+pub fn message(message: &str) -> Result<Response> {
     builder().message(message)
 }
 
-pub fn redirect(to: &str) -> Result<impl IntoResponse> {
-    Ok(Redirect::to(to))
+pub fn redirect(to: &str) -> Result<Response> {
+    Ok(Redirect::to(to).into_response())
 }
 
 pub fn builder() -> ResponseBuilder {
@@ -55,15 +54,16 @@ impl ResponseBuilder {
         }
     }
 
-    pub fn json<T: Serialize>(self, content: T) -> Result<impl IntoResponse> {
+    pub fn json<T: Serialize>(self, content: T) -> Result<Response> {
         let body = serde_json::to_string(&content).unwrap();
         Ok(self
             .response
             .header("content-type", "application/json")
-            .body(body)?)
+            .body(body)?
+            .into_response())
     }
 
-    pub fn message(self, message: &str) -> Result<impl IntoResponse> {
+    pub fn message(self, message: &str) -> Result<Response> {
         self.json(json!({ "message": message }))
     }
 }
