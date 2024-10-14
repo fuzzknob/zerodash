@@ -5,5 +5,5 @@ pub async fn index() -> impl IntoResponse {
 }
 
 pub async fn up() -> impl IntoResponse {
-    StatusCode::OK
+    res::message("Okay")
 }
