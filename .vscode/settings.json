@@ -1,5 +1,8 @@
 {
   "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always",
+  },
   "cSpell.words": [
     "zerodash"
   ]
