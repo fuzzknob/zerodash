@@ -70,7 +70,6 @@ impl IntoResponse for Error {
             ),
             Error::ValidationError(validation_error) => {
                 let mut errors = HashMap::<String, Vec<String>>::new();
-                dbg!(validation_error.clone().into_inner());
                 for (path, error) in validation_error.iter() {
                     let key = path.to_string();
                     let message = error.message();
@@ -80,17 +79,6 @@ impl IntoResponse for Error {
                     }
                     errors.insert(key, vec![message.to_string()]);
                 }
-                // for (key, kind) in validation_error.errors().to_owned() {
-                //     if let ValidationErrorsKind::Field(field_errors) = kind {
-                //         errors.insert(
-                //             key,
-                //             field_errors
-                //                 .iter()
-                //                 .map(|field_error| field_error.code.to_string())
-                //                 .collect(),
-                //         );
-                //     }
-                // }
                 (
                     StatusCode::BAD_REQUEST,
                     Json(json!({
