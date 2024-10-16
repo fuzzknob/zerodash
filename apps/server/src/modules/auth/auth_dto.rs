@@ -3,20 +3,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct RegisterDTO {
-    #[validate(length(min = 1))]
-    pub name: String,
-    #[validate(length(min = 4))]
-    pub username: String,
-    #[validate(email)]
-    pub email: String,
-    #[validate(length(min = 8))]
-    pub password: String,
+    #[garde(required, length(min = 1))]
+    pub name: Option<String>,
+    #[garde(required, length(min = 4))]
+    pub username: Option<String>,
+    #[garde(required, email, length(min = 4))]
+    pub email: Option<String>,
+    #[garde(required, length(min = 8))]
+    pub password: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct LoginDTO {
-    #[validate(length(min = 4))]
-    pub identity: String,
-    #[validate(length(min = 8))]
-    pub password: String,
+    #[garde(required, length(min = 4))]
+    pub identity: Option<String>,
+    #[garde(required, length(min = 8))]
+    pub password: Option<String>,
 }

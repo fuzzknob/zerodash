@@ -4,10 +4,8 @@ use super::{
 };
 use lunarus::prelude::*;
 
-pub async fn register(
-    State(db): State<Db>,
-    JsonValidator(new_user): JsonValidator<RegisterDTO>,
-) -> Result<Response> {
+pub async fn register(State(db): State<Db>, Json(new_user): Json<RegisterDTO>) -> Result<Response> {
+    new_user.validate()?;
     let result = AuthService::new(db).register(new_user).await?;
     match result {
         RegisterResult::UserAlreadyExists => res::builder()
@@ -17,10 +15,8 @@ pub async fn register(
     }
 }
 
-pub async fn login(
-    State(db): State<Db>,
-    JsonValidator(credentials): JsonValidator<LoginDTO>,
-) -> Result<Response> {
+pub async fn login(State(db): State<Db>, Json(credentials): Json<LoginDTO>) -> Result<Response> {
+    credentials.validate()?;
     let result = AuthService::new(db).login(credentials).await?;
     match result {
         LoginResult::Ok(session) => res::json(session),

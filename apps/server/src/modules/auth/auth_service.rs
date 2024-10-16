@@ -25,7 +25,7 @@ impl AuthService {
         if !res.is_empty() {
             return Ok(RegisterResult::UserAlreadyExists);
         }
-        let password_hash = hash::hash_password(new_user.password);
+        let password_hash = hash::hash_password(new_user.password.unwrap());
         let user: Option<AuthModel> = self
             .db
             .create(AUTH_TABLE_NAME)
@@ -33,19 +33,21 @@ impl AuthService {
                 name: new_user.name,
                 email: new_user.email,
                 username: new_user.username,
-                password: password_hash,
+                password: Some(password_hash),
             })
             .await?;
         Ok(RegisterResult::Ok(user.unwrap()))
     }
 
     pub async fn login(&self, credential: LoginDTO) -> Result<LoginResult> {
-        let user: Option<AuthModel> = if utils::is_email(&credential.identity) {
+        let identity = credential.identity.unwrap();
+        let password = credential.password.unwrap();
+        let user: Option<AuthModel> = if utils::is_email(&identity) {
             let mut result = self
                 .db
                 .query("SELECT * FROM type::table($table) WHERE email = $email")
                 .bind(("table", AUTH_TABLE_NAME))
-                .bind(("email", credential.identity))
+                .bind(("email", identity))
                 .await?;
             result.take(0)?
         } else {
@@ -53,7 +55,7 @@ impl AuthService {
                 .db
                 .query("SELECT * FROM type::table($table) WHERE username = $username")
                 .bind(("table", AUTH_TABLE_NAME))
-                .bind(("username", credential.identity))
+                .bind(("username", identity))
                 .await?;
             result.take(0)?
         };
@@ -61,7 +63,7 @@ impl AuthService {
             Some(user) => user,
             None => return Ok(LoginResult::UserNotFound),
         };
-        let is_password_valid = hash::verify_password(&credential.password, &user.password);
+        let is_password_valid = hash::verify_password(&password, &user.password);
         if !is_password_valid {
             return Ok(LoginResult::InvalidCredentials);
         }

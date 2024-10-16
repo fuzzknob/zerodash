@@ -11,8 +11,9 @@ pub async fn index(State(db): State<Db>) -> Result<impl IntoResponse> {
 #[debug_handler]
 pub async fn create(
     State(db): State<Db>,
-    JsonValidator(new_task): JsonValidator<CreateTaskDTO>,
+    Json(new_task): Json<CreateTaskDTO>,
 ) -> Result<impl IntoResponse> {
+    new_task.validate()?;
     TaskService::new(db).create_task(new_task).await?;
     res::builder()
         .status(StatusCode::CREATED)

@@ -6,7 +6,6 @@ use axum::{
 };
 use serde_json::json;
 use std::collections::HashMap;
-use validator::ValidationErrorsKind;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -53,7 +52,7 @@ pub enum Error {
     DbError(#[from] surrealdb::Error),
 
     #[error(transparent)]
-    ValidationError(#[from] validator::ValidationErrors),
+    ValidationError(#[from] garde::Report),
 
     #[error(transparent)]
     AxumFormRejection(#[from] rejection::JsonRejection),
@@ -70,18 +69,28 @@ impl IntoResponse for Error {
                 Json(json!({ "message": self.to_string() })),
             ),
             Error::ValidationError(validation_error) => {
-                let mut errors = HashMap::<&str, Vec<String>>::new();
-                for (key, kind) in validation_error.errors().to_owned() {
-                    if let ValidationErrorsKind::Field(field_errors) = kind {
-                        errors.insert(
-                            key,
-                            field_errors
-                                .iter()
-                                .map(|field_error| field_error.code.to_string())
-                                .collect(),
-                        );
+                let mut errors = HashMap::<String, Vec<String>>::new();
+                dbg!(validation_error.clone().into_inner());
+                for (path, error) in validation_error.iter() {
+                    let key = path.to_string();
+                    let message = error.message();
+                    if let Some(error) = errors.get_mut(&key) {
+                        error.push(message.to_string());
+                        continue;
                     }
+                    errors.insert(key, vec![message.to_string()]);
                 }
+                // for (key, kind) in validation_error.errors().to_owned() {
+                //     if let ValidationErrorsKind::Field(field_errors) = kind {
+                //         errors.insert(
+                //             key,
+                //             field_errors
+                //                 .iter()
+                //                 .map(|field_error| field_error.code.to_string())
+                //                 .collect(),
+                //         );
+                //     }
+                // }
                 (
                     StatusCode::BAD_REQUEST,
                     Json(json!({
