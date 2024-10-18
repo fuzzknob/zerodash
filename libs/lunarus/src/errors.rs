@@ -12,6 +12,9 @@ pub enum Error {
     #[error("Not Found")]
     NotFound,
 
+    #[error("Unauthenticated")]
+    Unauthenticated,
+
     #[error("internal server error")]
     InternalServerError,
 
@@ -66,6 +69,10 @@ impl IntoResponse for Error {
         let response = match self {
             Error::NotFound => (
                 StatusCode::NOT_FOUND,
+                Json(json!({ "message": self.to_string() })),
+            ),
+            Error::Unauthenticated => (
+                StatusCode::UNAUTHORIZED,
                 Json(json!({ "message": self.to_string() })),
             ),
             Error::ValidationError(validation_error) => {

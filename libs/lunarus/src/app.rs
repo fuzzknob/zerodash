@@ -7,7 +7,7 @@ use tower_http::{normalize_path::NormalizePath, trace};
 
 #[derive(Debug, Clone)]
 pub struct LunarusApp {
-    context: AppContext,
+    pub context: AppContext,
 }
 
 impl LunarusApp {

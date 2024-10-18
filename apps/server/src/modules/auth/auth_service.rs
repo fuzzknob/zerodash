@@ -79,6 +79,22 @@ impl AuthService {
             .take(0)?;
         Ok(LoginResult::Ok(session.unwrap()))
     }
+
+    pub async fn check_token_validity(self, token: &str) -> Result<()> {
+        let session: Option<SessionModel> = self
+            .db
+            .query("SELECT * FROM type::table($table) where token = $session_token;")
+            .bind(("table", SESSION_TABLE_NAME))
+            .bind(("session_token", token.to_string()))
+            .await?
+            .take(0)?;
+        let session = session.ok_or(Error::Unauthenticated)?;
+        if session.is_valid() {
+            Ok(())
+        } else {
+            Err(Error::Unauthenticated)
+        }
+    }
 }
 
 pub enum LoginResult {

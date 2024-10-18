@@ -17,3 +17,9 @@ pub struct SessionModel {
     #[serde(skip_serializing)]
     pub updated_at: Datetime,
 }
+
+impl SessionModel {
+    pub fn is_valid(&self) -> bool {
+        self.expiration > Datetime::default()
+    }
+}
