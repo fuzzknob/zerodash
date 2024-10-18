@@ -1,8 +1,8 @@
 use crate::{
     context::AppContext, database::initialize_database, errors::Error, prelude::run_migrations,
-    utils::get_env, Result,
+    res, utils::get_env, Result,
 };
-use axum::{extract::Request, Router, ServiceExt};
+use axum::{extract::Request, http::StatusCode, Router, ServiceExt};
 use tower_http::{normalize_path::NormalizePath, trace};
 
 #[derive(Debug, Clone)]
@@ -29,6 +29,7 @@ impl LunarusApp {
             .await
             .map_err(|_| Error::TCPBindingError)?;
         let router = install_layers(router.with_state(self.context));
+        let router = install_default_routes(router);
         let app = NormalizePath::trim_trailing_slash(router);
         tracing::info!("started server at {server_full_url}");
         axum::serve(listener, ServiceExt::<Request>::into_make_service(app)).await?;
@@ -48,6 +49,14 @@ fn initialize_tracing() -> Result<()> {
         .finish();
     tracing::subscriber::set_global_default(lunar_tracing)
         .map_err(|_| Error::TracingInitializationError)
+}
+
+fn install_default_routes(router: Router) -> Router {
+    router.fallback(|| async {
+        res::builder()
+            .status(StatusCode::NOT_FOUND)
+            .message("The router you're looking for doesn't exists")
+    })
 }
 
 fn install_layers(router: Router) -> Router {
