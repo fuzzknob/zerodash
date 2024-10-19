@@ -21,13 +21,14 @@ impl LunarusApp {
         })
     }
 
-    pub async fn start(self, router: Router<AppContext>) -> Result<()> {
+    pub async fn start(self, router_builder: fn(AppContext) -> Router<AppContext>) -> Result<()> {
         let server_address = get_env("SERVER_URL").unwrap_or("0.0.0.0".to_string());
         let server_port = get_env("SERVER_PORT").unwrap_or("8000".to_string());
         let server_full_url = format!("{server_address}:{server_port}");
         let listener = tokio::net::TcpListener::bind(&server_full_url)
             .await
             .map_err(|_| Error::TCPBindingError)?;
+        let router = router_builder(self.context.clone());
         let router = install_layers(router.with_state(self.context));
         let router = install_default_routes(router);
         let app = NormalizePath::trim_trailing_slash(router);
