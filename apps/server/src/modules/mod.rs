@@ -2,6 +2,7 @@ use lunarus::prelude::*;
 
 pub mod auth;
 pub mod home;
+pub mod spaces;
 pub mod tasks;
 pub mod users;
 
