@@ -1,9 +1,6 @@
 use lunarus::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[allow(dead_code)]
-pub const SESSION_TABLE_NAME: &str = "sessions";
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionModel {
     #[serde(skip_serializing)]
@@ -19,6 +16,8 @@ pub struct SessionModel {
 }
 
 impl SessionModel {
+    pub const TABLE_NAME: &str = "sessions";
+
     pub fn is_valid(&self) -> bool {
         self.expiration > Datetime::default()
     }

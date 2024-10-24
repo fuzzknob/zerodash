@@ -24,7 +24,6 @@ DEFINE FIELD created_at ON sessions TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON sessions TYPE datetime VALUE time::now();
 DEFINE INDEX OVERWRITE tokenIndex ON TABLE sessions FIELDS token UNIQUE;
 
-
 ---------------------------------
 -- TABLE: spaces
 ---------------------------------
@@ -43,22 +42,21 @@ DEFINE TABLE OVERWRITE boards TYPE NORMAL SCHEMAFULL;
 DEFINE FIELD name ON boards TYPE string;
 DEFINE FIELD description ON boards TYPE option<string>;
 DEFINE FIELD icon ON boards TYPE option<string>;
-DEFINE FIELD primary ON boards TYPE bool DEFAULT false;
 DEFINE FIELD space ON boards TYPE record<spaces>;
 DEFINE FIELD created_at ON boards TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
 
----------------------------------
--- TABLE: boards
----------------------------------
-DEFINE TABLE OVERWRITE boards TYPE NORMAL SCHEMAFULL;
-DEFINE FIELD name ON boards TYPE string;
-DEFINE FIELD description ON boards TYPE option<string>;
-DEFINE FIELD icon ON boards TYPE option<string>;
-DEFINE FIELD primary ON boards TYPE bool DEFAULT false;
-DEFINE FIELD space ON boards TYPE record<spaces>;
-DEFINE FIELD created_at ON boards TYPE datetime DEFAULT time::now();
-DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
+-- ---------------------------------
+-- -- TABLE: boards
+-- ---------------------------------
+-- DEFINE TABLE OVERWRITE boards TYPE NORMAL SCHEMAFULL;
+-- DEFINE FIELD name ON boards TYPE string;
+-- DEFINE FIELD description ON boards TYPE option<string>;
+-- DEFINE FIELD icon ON boards TYPE option<string>;
+-- DEFINE FIELD primary ON boards TYPE bool DEFAULT false;
+-- DEFINE FIELD space ON boards TYPE record<spaces>;
+-- DEFINE FIELD created_at ON boards TYPE datetime DEFAULT time::now();
+-- DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
 
 ---------------------------------
 -- TABLE: task_states
@@ -66,11 +64,21 @@ DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
 DEFINE TABLE OVERWRITE task_states TYPE NORMAL SCHEMAFULL;
 DEFINE FIELD name ON task_states TYPE string;
 DEFINE FIELD color ON task_states TYPE string;
-DEFINE FIELD done ON task_states TYPE bool;
-DEFINE FIELD task_index ON task_states TYPE int;
+DEFINE FIELD index ON task_list_index TYPE int;
+DEFINE FIELD state_type ON task_states TYPE "TODO" | "COMPLETED";
 DEFINE FIELD board ON task_states TYPE record<boards>;
 DEFINE FIELD created_at ON task_states TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON task_states TYPE datetime VALUE time::now();
+
+---------------------------------
+-- TABLE: task_list_index
+---------------------------------
+DEFINE TABLE OVERWRITE task_list_index TYPE NORMAL SCHEMAFULL;
+DEFINE FIELD task_state ON task_list_index TYPE record<task_states>;
+DEFINE FIELD task ON task_list_index TYPE record<tasks>;
+DEFINE FIELD index ON task_list_index TYPE int;
+DEFINE FIELD created_at ON task_list_index TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at ON task_list_index TYPE datetime VALUE time::now();
 
 ---------------------------------
 -- TABLE: task_tags
@@ -106,19 +114,9 @@ DEFINE FIELD created_at ON tasks TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON tasks TYPE datetime VALUE time::now();
 
 ---------------------------------
--- TABLE: board_lists
----------------------------------
-DEFINE TABLE OVERWRITE board_lists TYPE NORMAL SCHEMAFULL;
-DEFINE FIELD board_index ON board_lists TYPE int;
-DEFINE FIELD task ON board_lists TYPE record<tasks>;
-DEFINE FIELD task_state ON board_lists TYPE record<task_states>;
-DEFINE FIELD created_at ON board_lists TYPE datetime DEFAULT time::now();
-DEFINE FIELD updated_at ON board_lists TYPE datetime VALUE time::now();
-
----------------------------------
--- TABLE: users
+-- TABLE: users_spaces
 ---------------------------------
 DEFINE TABLE OVERWRITE users_spaces TYPE RELATION  FROM users TO spaces SCHEMAFULL;
-DEFINE FIELD user_roles ON users_spaces TYPE "OWNER" | "EDITOR" | "GUEST";
+DEFINE FIELD user_role ON users_spaces TYPE "OWNER" | "EDITOR" | "GUEST";
 DEFINE FIELD created_at ON users_spaces TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON users_spaces TYPE datetime VALUE time::now();

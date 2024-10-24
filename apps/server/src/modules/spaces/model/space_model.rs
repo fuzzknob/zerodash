@@ -1,15 +1,17 @@
 use lunarus::prelude::*;
 use serde::{Deserialize, Serialize};
 
-pub const AUTH_TABLE_NAME: &str = "users";
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AuthModel {
+pub struct SpaceModel {
     pub id: Id,
     pub name: String,
-    pub username: String,
-    pub email: String,
-    pub password: String,
+    pub description: Option<String>,
+    pub icon: Option<String>,
+    pub primary: bool,
     pub created_at: Datetime,
     pub updated_at: Datetime,
+}
+
+impl SpaceModel {
+    pub const TABLE_NAME: &str = "spaces";
 }
