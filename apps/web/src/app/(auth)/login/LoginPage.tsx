@@ -27,7 +27,7 @@ const LoginPage = () => {
 				form.validate()
 				console.log(values)
 			})}
-			className="flex w-[300px] flex-col"
+			className="flex w-[350px] flex-col"
 		>
 			<div className="mb-12 self-center">
 				<Logo />
@@ -46,7 +46,7 @@ const LoginPage = () => {
 			</div>
 			<Link
 				className="mt-1 mb-4 self-end text-blue-700 text-sm"
-				href="/forget-password"
+				href="/reset-password"
 			>
 				Forget password?
 			</Link>
