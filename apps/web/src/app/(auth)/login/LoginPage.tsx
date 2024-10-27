@@ -1,10 +1,11 @@
 'use client'
-import Logo from '@/components/Logo'
-import { useForm } from '@mantine/form'
 import { z } from 'zod'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { Button, PasswordInput, TextInput } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import Link from 'next/link'
+
+import Logo from '@/components/Logo'
 
 const formSchema = z.object({
 	identity: z.string(),
@@ -28,12 +29,20 @@ const LoginPage = () => {
 			})}
 			className="flex w-[300px] flex-col"
 		>
-			<div className="mb-10 self-center">
+			<div className="mb-12 self-center">
 				<Logo />
 			</div>
 			<div className="flex flex-col gap-6">
-				<TextInput placeholder="Username or Email address" />
-				<PasswordInput placeholder="Password" />
+				<TextInput
+					placeholder="Username or Email address"
+					key={form.key('identity')}
+					{...form.getInputProps('identity')}
+				/>
+				<PasswordInput
+					placeholder="Password"
+					key={form.key('password')}
+					{...form.getInputProps('password')}
+				/>
 			</div>
 			<Link
 				className="mt-1 mb-4 self-end text-blue-700 text-sm"
