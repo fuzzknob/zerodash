@@ -45,6 +45,10 @@ pub enum Error {
     #[error("error while getting {0} environment variable")]
     EnvironmentVariableError(String),
 
+    #[error("{0}")]
+    EmailSendError(String),
+
+    // Third party errors
     #[error(transparent)]
     SerdeError(#[from] serde_json::Error),
 
@@ -59,6 +63,12 @@ pub enum Error {
 
     #[error(transparent)]
     AxumFormRejection(#[from] rejection::JsonRejection),
+
+    #[error(transparent)]
+    ReqwestError(#[from] reqwest::Error),
+
+    #[error(transparent)]
+    RenderError(#[from] handlebars::RenderError),
 
     #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error>),

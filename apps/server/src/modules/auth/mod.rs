@@ -4,6 +4,7 @@ pub mod auth_controller;
 pub mod auth_middleware;
 pub mod auth_service;
 pub mod dto;
+pub mod email;
 pub mod model;
 
 pub fn auth_routes() -> Router<AppContext> {

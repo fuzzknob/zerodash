@@ -6,6 +6,7 @@ DEFINE FIELD name ON users TYPE string;
 DEFINE FIELD email ON users TYPE string ASSERT string::is::email($value);
 DEFINE FIELD username ON users TYPE string;
 DEFINE FIELD password ON users TYPE string;
+DEFINE FIELD email_verified_at ON users TYPE option<datetime>;
 DEFINE FIELD profile_pic ON users TYPE option<string>;
 DEFINE FIELD created_at ON users TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON users TYPE datetime VALUE time::now();

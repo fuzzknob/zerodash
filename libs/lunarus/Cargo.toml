@@ -15,5 +15,7 @@ tracing-subscriber = { workspace = true }
 surrealdb = { workspace = true }
 validator = { workspace = true, features = ["derive"] }
 garde = { workspace = true, features = ["full"] }
+reqwest = { workspace = true, features = ["json"] }
+handlebars = { workspace = true }
 tower-http = { version = "0.6.1", features = ["normalize-path", "trace"] }
 colored = "2.1.0"

@@ -9,6 +9,7 @@ pub struct UserModel {
     pub email: String,
     #[serde(skip_serializing)]
     pub password: String,
+    pub email_verified_at: Option<Datetime>,
     pub created_at: Datetime,
     pub updated_at: Datetime,
 }
