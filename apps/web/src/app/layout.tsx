@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core'
 import clsx from 'clsx'
 import './globals.css'
+import '@mantine/core/styles.css'
 
 const inter = Inter({
 	weight: ['300', '400', '500'],
@@ -14,6 +16,10 @@ export const metadata: Metadata = {
 	description: 'The only dashboard you’ll ever need',
 }
 
+const theme = createTheme({
+	primaryColor: 'dark',
+})
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -21,8 +27,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={clsx(inter.variable)}>
-			<body className="bg-background-primary h-screen w-screen antialiased">
-				{children}
+			<head>
+				<ColorSchemeScript />
+			</head>
+			<body className="h-screen w-screen bg-background-primary antialiased">
+				<MantineProvider theme={theme} defaultColorScheme="light">
+					{children}
+				</MantineProvider>
 			</body>
 		</html>
 	)
