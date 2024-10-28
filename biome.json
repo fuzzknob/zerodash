@@ -8,7 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [".next", "dist", ".vscode", ".zed", ".idea"]
+    "ignore": [".next", "dist", ".vscode", ".zed", ".idea", "/node_modules"]
   },
   "formatter": {
     "enabled": true,
