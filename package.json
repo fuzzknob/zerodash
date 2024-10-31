@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": "true",
   "scripts": {
-    "web-dev": "pnpm --filter zerodash-homepage dev",
-    "web-start": "pnpm web-build && pnpm --filter zerodash-homepage start",
-    "web-build": "pnpm --filter zerodash-homepage build",
+    "homepage-dev": "pnpm --filter zerodash-homepage dev",
+    "homepage-start": "pnpm homepage-build && pnpm --filter zerodash-homepage start",
+    "homepage-build": "pnpm --filter zerodash-homepage build",
     "server-dev": "cargo watch -x 'run -- -p zerodash-server'",
     "server-start": "cargo run -p zerodash-server"
   },

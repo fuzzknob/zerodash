@@ -3,6 +3,7 @@ use axum::{
     http,
     response::{Html, IntoResponse, Redirect, Response},
 };
+use axum_extra::extract::SignedCookieJar;
 use serde::Serialize;
 use serde_json::json;
 
@@ -52,6 +53,16 @@ impl ResponseBuilder {
         Self {
             response: self.response.header(key, value),
         }
+    }
+
+    pub fn signed_cookies(mut self, jar: SignedCookieJar) -> Self {
+        let headers = self.response.headers_mut().unwrap();
+        for cookie in jar.iter() {
+            if let Ok(header_value) = cookie.encoded().to_string().parse() {
+                headers.append("set-cookie", header_value);
+            }
+        }
+        self
     }
 
     pub fn json<T: Serialize>(self, content: T) -> Result<Response> {

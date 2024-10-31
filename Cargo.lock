@@ -381,6 +381,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "axum-extra"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73c3220b188aea709cf1b6c5f9b01c3bd936bb08bd2b5184a12b35ac8131b1f9"
+dependencies = [
+ "axum",
+ "axum-core",
+ "bytes",
+ "cookie",
+ "futures-util",
+ "http",
+ "http-body",
+ "http-body-util",
+ "mime",
+ "pin-project-lite",
+ "serde",
+ "tower",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
 name = "axum-macros"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -780,6 +803,22 @@ name = "constant_time_eq"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
+
+[[package]]
+name = "cookie"
+version = "0.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ddef33a339a91ea89fb53151bd0a4689cfce27055c291dfa69945475d22c747"
+dependencies = [
+ "base64 0.22.1",
+ "hmac",
+ "percent-encoding",
+ "rand",
+ "sha2",
+ "subtle",
+ "time",
+ "version_check",
+]
 
 [[package]]
 name = "core-foundation"
@@ -1962,7 +2001,9 @@ name = "lunarus"
 version = "0.0.0"
 dependencies = [
  "axum",
+ "axum-extra",
  "colored",
+ "cookie",
  "dotenvy",
  "garde",
  "handlebars",
@@ -4933,15 +4974,20 @@ version = "0.0.0"
 dependencies = [
  "argon2",
  "axum",
+ "axum-extra",
+ "base64 0.22.1",
  "chrono",
+ "cookie",
  "garde",
  "lunarus",
+ "rand_chacha",
  "regex",
  "serde",
  "serde_json",
  "serde_with_macros",
  "surrealdb",
  "thiserror",
+ "time",
  "tokio",
  "tracing",
  "uuid",

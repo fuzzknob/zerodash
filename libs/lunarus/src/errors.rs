@@ -33,6 +33,9 @@ pub enum Error {
     #[error("Database credential error")]
     DatabaseCredentialError,
 
+    #[error("Database query error")]
+    DatabaseQueryError,
+
     #[error("TCP binding error")]
     TCPBindingError,
 

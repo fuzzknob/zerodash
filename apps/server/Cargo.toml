@@ -14,7 +14,12 @@ garde = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 surrealdb = { workspace = true }
 chrono = { workspace = true }
+axum-extra = { workspace = true, features = ["cookie-signed"] }
+cookie = { workspace = true }
+rand_chacha = { workspace = true, features = ["default"] }
 argon2 = { version = "0.5.3" }
 regex = "1.11.0"
 uuid = { version = "1.10.0", features = ["v4", "fast-rng"] }
 serde_with_macros = { version = "3.11.0" }
+time = { version = "0.3" }
+base64 = "0.22.1"

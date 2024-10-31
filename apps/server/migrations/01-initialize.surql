@@ -26,6 +26,17 @@ DEFINE FIELD updated_at ON sessions TYPE datetime VALUE time::now();
 DEFINE INDEX OVERWRITE tokenIndex ON TABLE sessions FIELDS token UNIQUE;
 
 ---------------------------------
+-- TABLE: exchange_token
+---------------------------------
+DEFINE TABLE OVERWRITE exchange_token TYPE NORMAL SCHEMAFULL;
+DEFINE FIELD token ON exchange_token TYPE string;
+DEFINE FIELD user ON exchange_token TYPE record<users>;
+DEFINE FIELD expiration ON exchange_token TYPE datetime DEFAULT time::now();
+DEFINE FIELD created_at ON exchange_token TYPE datetime DEFAULT time::now();
+DEFINE FIELD updated_at ON exchange_token TYPE datetime VALUE time::now();
+DEFINE INDEX OVERWRITE tokenIndex ON TABLE exchange_token FIELDS token UNIQUE;
+
+---------------------------------
 -- TABLE: spaces
 ---------------------------------
 DEFINE TABLE OVERWRITE spaces TYPE NORMAL SCHEMAFULL;

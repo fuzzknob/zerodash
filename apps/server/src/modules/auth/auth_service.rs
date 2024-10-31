@@ -1,5 +1,5 @@
 use super::dto::{LoginDTO, RegisterDTO};
-use super::model::SessionModel;
+use super::model::{ExchangeTokenModel, SessionModel};
 use crate::modules::boards::board_service::BoardService;
 use crate::modules::spaces::space_service::SpaceService;
 use crate::modules::users::model::UserModel;
@@ -69,17 +69,54 @@ impl AuthService {
         if !is_password_valid {
             return Ok(LoginResult::InvalidCredentials);
         }
-        let expiration = chrono::Utc::now() + chrono::Duration::days(30);
-        let session: Option<SessionModel> = self
+        let expiration = chrono::Utc::now() + chrono::Duration::minutes(1);
+        let exchange_token: Option<ExchangeTokenModel> = self
             .db
-            .query("CREATE type::table($table) set token = type::string($session_token), user = type::thing($user_id), expiration = $expiration")
-            .bind(("table", SessionModel::TABLE_NAME))
-            .bind(("session_token", hash::get_unique_random_hash()))
+            .query("CREATE type::table($table) set token = type::string($exchange_token), user = type::thing($user_id), expiration = $expiration")
+            .bind(("table", ExchangeTokenModel::TABLE_NAME))
+            .bind(("exchange_token", hash::get_unique_random_hash()))
             .bind(("user_id", format!("{}:{}", UserModel::TABLE_NAME, user.id.to_string())))
             .bind(("expiration", Datetime::from(expiration)))
             .await?
             .take(0)?;
-        Ok(LoginResult::Ok(session.unwrap()))
+        let exchange_token = exchange_token.unwrap();
+        Ok(LoginResult::Ok(exchange_token.token))
+    }
+
+    pub async fn login_with_token(self, token: String) -> Result<TokenLoginResult> {
+        let exchange_token: Option<ExchangeTokenModel> = self
+            .db
+            .query("SELECT * FROM type::table($table) WHERE token = $exchange_token;")
+            .bind(("table", ExchangeTokenModel::TABLE_NAME))
+            .bind(("exchange_token", token))
+            .await?
+            .take(0)?;
+        let Some(exchange_token) = exchange_token else {
+            return Ok(TokenLoginResult::InvalidToken);
+        };
+        if !exchange_token.is_valid() {
+            return Ok(TokenLoginResult::InvalidToken);
+        }
+        let session = self.create_session(exchange_token.user).await?;
+        let db = self.db.clone();
+        tokio::spawn(async move {
+            if let Err(error) = db
+                .query("DELETE type::record($exchange_token)")
+                .bind((
+                    "exchange_token",
+                    format!(
+                        "{}:{}",
+                        ExchangeTokenModel::TABLE_NAME,
+                        exchange_token.id.to_string()
+                    ),
+                ))
+                .await
+            {
+                // TODO: submit this error to sentry
+                tracing::error!("{}", error);
+            }
+        });
+        Ok(TokenLoginResult::Ok(session.token))
     }
 
     pub async fn check_token_validity(self, token: &str) -> Result<()> {
@@ -107,12 +144,37 @@ impl AuthService {
             .await?;
         Ok(())
     }
+
+    async fn create_session(&self, user_id: Id) -> Result<SessionModel> {
+        let expiration = chrono::Utc::now() + chrono::Duration::days(30);
+        let session: Option<SessionModel> = self
+            .db
+            .query("CREATE type::table($table) set token = type::string($session_token), user = type::thing($user_id), expiration = $expiration")
+            .bind(("table", SessionModel::TABLE_NAME))
+            .bind(("session_token", hash::get_unique_random_hash()))
+            .bind(("user_id", format!("{}:{}", UserModel::TABLE_NAME, user_id.to_string())))
+            .bind(("expiration", Datetime::from(expiration)))
+            .await?
+            .take(0)?;
+        session.ok_or(Error::DatabaseQueryError)
+    }
 }
 
+// pub enum LoginResult {
+//     Ok(SessionModel),
+//     UserNotFound,
+//     InvalidCredentials,
+// }
+
 pub enum LoginResult {
-    Ok(SessionModel),
+    Ok(String),
     UserNotFound,
     InvalidCredentials,
+}
+
+pub enum TokenLoginResult {
+    Ok(String),
+    InvalidToken,
 }
 
 pub enum RegisterResult {

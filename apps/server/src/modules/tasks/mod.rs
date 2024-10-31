@@ -16,7 +16,7 @@ pub fn task_routes(context: AppContext) -> Router<AppContext> {
         )
         .route("/tasks/:id", patch(tasks_controller::update))
         .layer(from_fn_with_state(
-            context.clone(),
+            context,
             auth_middleware::auth_middleware,
         ))
 }

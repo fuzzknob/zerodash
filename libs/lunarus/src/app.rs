@@ -1,8 +1,14 @@
 use crate::{
-    context::AppContext, database::initialize_database, errors::Error, prelude::run_migrations,
-    res, utils::get_env, Result,
+    context::AppContext,
+    database::initialize_database,
+    errors::Error,
+    prelude::run_migrations,
+    res,
+    utils::{get_env, get_required_env},
+    Result,
 };
 use axum::{extract::Request, http::StatusCode, Router, ServiceExt};
+use axum_extra::extract::cookie::Key;
 use tower_http::{normalize_path::NormalizePath, trace};
 
 #[derive(Debug, Clone)]
@@ -15,9 +21,11 @@ impl LunarusApp {
         initialize_environment()?;
         initialize_tracing()?;
         let db = initialize_database().await?;
+        let key = get_required_env("COOKIE_KEY");
+        let key = Key::from(key.as_bytes());
         run_migrations(&db).await?;
         Ok(Self {
-            context: AppContext { db },
+            context: AppContext { db, key },
         })
     }
 

@@ -12,6 +12,7 @@ pub fn auth_routes() -> Router<AppContext> {
         "/auth",
         Router::new()
             .route("/register", post(auth_controller::register))
-            .route("/login", post(auth_controller::login)),
+            .route("/login", post(auth_controller::login))
+            .route("/login-with-token", get(auth_controller::login_with_token)),
     )
 }
