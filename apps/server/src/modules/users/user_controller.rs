@@ -1,5 +1,7 @@
 use lunarus::prelude::*;
 
-pub async fn me() -> Result<impl IntoResponse> {
-    res::message("todo profile")
+use super::model::UserModel;
+
+pub async fn me(user: UserModel) -> Result<Response> {
+    res::json(user)
 }

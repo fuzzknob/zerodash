@@ -83,7 +83,7 @@ impl AuthService {
         Ok(LoginResult::Ok(exchange_token.token))
     }
 
-    pub async fn login_with_token(self, token: String) -> Result<TokenLoginResult> {
+    pub async fn login_with_token(&self, token: String) -> Result<TokenLoginResult> {
         let exchange_token: Option<ExchangeTokenModel> = self
             .db
             .query("SELECT * FROM type::table($table) WHERE token = $exchange_token;")
@@ -119,7 +119,7 @@ impl AuthService {
         Ok(TokenLoginResult::Ok(session.token))
     }
 
-    pub async fn check_token_validity(self, token: &str) -> Result<()> {
+    pub async fn check_token_validity(&self, token: &str) -> Result<()> {
         let session: Option<SessionModel> = self
             .db
             .query("SELECT * FROM type::table($table) where token = $session_token;")
@@ -145,6 +145,17 @@ impl AuthService {
         Ok(())
     }
 
+    pub async fn get_user_from_session(&self, token: String) -> Result<UserModel> {
+        let user: Option<UserModel> = self
+            .db
+            .query("(SELECT user.* FROM type::table($table) WHERE token = $session_token).user;")
+            .bind(("table", SessionModel::TABLE_NAME))
+            .bind(("session_token", token))
+            .await?
+            .take(0)?;
+        user.ok_or(Error::DatabaseQueryError)
+    }
+
     async fn create_session(&self, user_id: Id) -> Result<SessionModel> {
         let expiration = chrono::Utc::now() + chrono::Duration::days(30);
         let session: Option<SessionModel> = self
@@ -159,12 +170,6 @@ impl AuthService {
         session.ok_or(Error::DatabaseQueryError)
     }
 }
-
-// pub enum LoginResult {
-//     Ok(SessionModel),
-//     UserNotFound,
-//     InvalidCredentials,
-// }
 
 pub enum LoginResult {
     Ok(String),
