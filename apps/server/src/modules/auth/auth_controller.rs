@@ -55,7 +55,7 @@ pub async fn login_with_token(
             .message("Invalid Token");
     };
     let cookie = cookie::Cookie::build(("Authorization", format!("Bearer {}", session_token)))
-        .secure(true)
+        // .secure(true)
         .same_site(cookie::SameSite::Strict)
         .http_only(true)
         .path("/")

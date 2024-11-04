@@ -14,6 +14,7 @@ use tower_http::{normalize_path::NormalizePath, trace};
 #[derive(Debug, Clone)]
 pub struct LunarusApp {
     pub context: AppContext,
+    pub router: Router<AppContext>,
 }
 
 impl LunarusApp {
@@ -26,19 +27,27 @@ impl LunarusApp {
         run_migrations(&db).await?;
         Ok(Self {
             context: AppContext { db, key },
+            router: Router::new(),
         })
     }
 
-    pub async fn start(self, router_builder: fn(AppContext) -> Router<AppContext>) -> Result<()> {
+    pub fn plug(
+        mut self,
+        plugin: fn(AppContext, Router<AppContext>) -> Router<AppContext>,
+    ) -> Self {
+        let router = plugin(self.context.clone(), self.router);
+        self.router = router;
+        self
+    }
+
+    pub async fn start(self) -> Result<()> {
         let server_address = get_env("SERVER_URL").unwrap_or("0.0.0.0".to_string());
         let server_port = get_env("SERVER_PORT").unwrap_or("8000".to_string());
         let server_full_url = format!("{server_address}:{server_port}");
         let listener = tokio::net::TcpListener::bind(&server_full_url)
             .await
             .map_err(|_| Error::TCPBindingError)?;
-        let router = router_builder(self.context.clone());
-        let router = install_layers(router.with_state(self.context));
-        let router = install_default_routes(router);
+        let router = self.router.with_state(self.context);
         let app = NormalizePath::trim_trailing_slash(router);
         tracing::info!("started server at {server_full_url}");
         axum::serve(listener, ServiceExt::<Request>::into_make_service(app)).await?;
@@ -60,19 +69,17 @@ fn initialize_tracing() -> Result<()> {
         .map_err(|_| Error::TracingInitializationError)
 }
 
-fn install_default_routes(router: Router) -> Router {
-    router.fallback(|| async {
-        res::builder()
-            .status(StatusCode::NOT_FOUND)
-            .message("The router you're looking for doesn't exists")
-    })
-}
-
-fn install_layers(router: Router) -> Router {
-    router.layer(
-        trace::TraceLayer::new_for_http()
-            .make_span_with(trace::DefaultMakeSpan::new().level(tracing::Level::INFO))
-            .on_response(trace::DefaultOnResponse::new().level(tracing::Level::INFO))
-            .on_failure(trace::DefaultOnFailure::new().level(tracing::Level::ERROR)),
-    )
+pub fn default_plugins(_: AppContext, router: Router<AppContext>) -> Router<AppContext> {
+    router
+        .fallback(|| async {
+            res::builder()
+                .status(StatusCode::NOT_FOUND)
+                .message("The router you're looking for doesn't exists")
+        })
+        .layer(
+            trace::TraceLayer::new_for_http()
+                .make_span_with(trace::DefaultMakeSpan::new().level(tracing::Level::INFO))
+                .on_response(trace::DefaultOnResponse::new().level(tracing::Level::INFO))
+                .on_failure(trace::DefaultOnFailure::new().level(tracing::Level::ERROR)),
+        )
 }
