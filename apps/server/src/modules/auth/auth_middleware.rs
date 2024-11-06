@@ -13,7 +13,7 @@ pub async fn auth_middleware(
 ) -> Result<impl IntoResponse> {
     let cookie = jar.get("Authorization");
     let token = if let Some(cookie) = cookie {
-        cookie.to_string()
+        cookie.value().to_string()
     } else {
         let header = headers.get("Authorization").ok_or(Error::Unauthenticated)?;
         header

@@ -1,3 +1,4 @@
 packages:
   - apps/homepage
   - apps/web
+  - libs/web-core

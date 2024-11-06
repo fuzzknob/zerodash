@@ -1,3 +1,12 @@
+import { useEffect } from 'react'
+import { useAtom } from 'jotai'
+
+import { getUser, userProvider } from '@/modules/user'
+
 export const HomeScreen = () => {
-	return <div>Homescreen</div>
+	const [user] = useAtom(userProvider)
+	useEffect(() => {
+		getUser()
+	}, [])
+	return <div>{user?.name}</div>
 }

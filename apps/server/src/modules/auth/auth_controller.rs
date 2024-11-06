@@ -39,31 +39,66 @@ pub async fn login(State(db): State<Db>, Json(credentials): Json<LoginDTO>) -> R
     }
 }
 
+// #[debug_handler]
+// pub async fn login_with_token(
+//     State(context): State<AppContext>,
+//     jar: SignedCookieJar,
+//     Query(exchange_token): Query<TokenLoginDto>,
+// ) -> Result<Response> {
+//     exchange_token.validate()?;
+//     let result = AuthService::new(context.db)
+//         .login_with_token(exchange_token.token)
+//         .await?;
+//     let TokenLoginResult::Ok(session_token) = result else {
+//         return res::builder()
+//             .status(StatusCode::BAD_REQUEST)
+//             .message("Invalid Token");
+//     };
+//     let cookie = cookie::Cookie::build(("Authorization", format!("Bearer {}", session_token)))
+//         // .secure(true)
+//         .same_site(cookie::SameSite::None)
+//         .http_only(true)
+//         // .domain("http://localhost:3030")
+//         .path("/")
+//         .max_age(time::Duration::days(30))
+//         .build();
+//     let jar = jar.add(cookie);
+//     res::builder()
+//         .status(StatusCode::OK)
+//         .signed_cookies(jar)
+//         .message("authenticated")
+// }
+
+// TODO: find a way to make it more idiomatic
 #[debug_handler]
 pub async fn login_with_token(
     State(context): State<AppContext>,
     jar: SignedCookieJar,
     Query(exchange_token): Query<TokenLoginDto>,
-) -> Result<Response> {
+) -> Result<impl IntoResponse> {
     exchange_token.validate()?;
     let result = AuthService::new(context.db)
         .login_with_token(exchange_token.token)
         .await?;
     let TokenLoginResult::Ok(session_token) = result else {
-        return res::builder()
-            .status(StatusCode::BAD_REQUEST)
-            .message("Invalid Token");
+        return Err(Error::Unauthenticated);
+        // (StatusCode::BAD_REQUEST, "Invalid Token")
+        // return res::builder()
+        //     .status(StatusCode::BAD_REQUEST)
+        //     .message("Invalid Token");
     };
     let cookie = cookie::Cookie::build(("Authorization", format!("Bearer {}", session_token)))
         // .secure(true)
-        .same_site(cookie::SameSite::Strict)
+        .same_site(cookie::SameSite::None)
         .http_only(true)
+        // .domain("http://localhost:3030")
         .path("/")
         .max_age(time::Duration::days(30))
         .build();
     let jar = jar.add(cookie);
-    res::builder()
-        .status(StatusCode::OK)
-        .signed_cookies(jar)
-        .message("authenticated")
+    Ok((jar, "authenticated"))
+    // res::builder()
+    //     .status(StatusCode::OK)
+    //     .signed_cookies(jar)
+    //     .message("authenticated")
 }

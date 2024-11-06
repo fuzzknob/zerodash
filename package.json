@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": "true",
   "scripts": {
-    "homepage-dev": "pnpm --filter zerodash-homepage dev",
-    "homepage-start": "pnpm homepage-build && pnpm --filter zerodash-homepage start",
-    "homepage-build": "pnpm --filter zerodash-homepage build",
+    "homepage-dev": "pnpm --filter @zerodash/homepage dev",
+    "homepage-start": "pnpm homepage-build && pnpm --filter @zerodash/homepage start",
+    "homepage-build": "pnpm --filter @zerodash/homepage build",
+    "web-dev": "pnpm --filter @zerodash/web dev",
+    "web-build": "pnpm --filter @zerodash/web build",
     "server-dev": "cargo watch -x 'run -- -p zerodash-server'",
     "server-start": "cargo run -p zerodash-server"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.3"
+    "@biomejs/biome": "^1.9.4"
   }
 }

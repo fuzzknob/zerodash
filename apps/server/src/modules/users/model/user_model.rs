@@ -45,7 +45,7 @@ where
         let jar = SignedCookieJar::from_headers(&parts.headers, key);
         let cookie = jar.get("Authorization");
         let token = if let Some(cookie) = cookie {
-            cookie.to_string()
+            cookie.value().to_string()
         } else {
             let header = parts
                 .headers

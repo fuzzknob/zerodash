@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 
@@ -12,11 +11,7 @@ function initialize() {
 		document.write('id with root element not found')
 		return
 	}
-	createRoot(root).render(
-		<StrictMode>
-			<RouterProvider router={router} />
-		</StrictMode>,
-	)
+	createRoot(root).render(<RouterProvider router={router} />)
 }
 
 initialize()

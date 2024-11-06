@@ -1,5 +1,5 @@
 {
-  "name": "zerodash-web",
+  "name": "@zerodash/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@zerodash/web-core": "workspace:*",
     "@mantine/core": "^7.13.4",
     "@mantine/dates": "^7.13.4",
     "@mantine/form": "^7.13.4",
@@ -21,7 +22,9 @@
     "@tiptap/pm": "^2.9.1",
     "@tiptap/react": "^2.9.1",
     "@tiptap/starter-kit": "^2.9.1",
+    "axios": "^1.7.7",
     "dayjs": "^1.11.13",
+    "jotai": "^2.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0"

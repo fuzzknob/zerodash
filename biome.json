@@ -29,16 +29,6 @@
           "fix": "safe",
           "level": "warn"
         }
-      },
-      "nursery": {
-        "useSortedClasses": {
-          "fix": "unsafe",
-          "level": "warn",
-          "options": {
-            "attributes": ["className", "class"],
-            "functions": ["cva"]
-          }
-        }
       }
     }
   },

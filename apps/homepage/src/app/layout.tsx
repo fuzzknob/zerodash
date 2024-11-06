@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core'
 import clsx from 'clsx'
-import './globals.css'
+import { Notifications } from '@mantine/notifications'
 import '@mantine/core/styles.css'
+import '@mantine/notifications/styles.css'
+
+import './globals.css'
 
 const inter = Inter({
 	weight: ['300', '400', '500'],
@@ -30,9 +33,12 @@ export default function RootLayout({
 			<head>
 				<ColorSchemeScript />
 			</head>
-			<body className="h-screen w-screen bg-background-primary antialiased">
+			<body>
 				<MantineProvider theme={theme} defaultColorScheme="light">
-					{children}
+					<Notifications />
+					<main className="w-screen h-screen antialiased bg-background-primary">
+						{children}
+					</main>
 				</MantineProvider>
 			</body>
 		</html>
