@@ -13,6 +13,7 @@ request.interceptors.response.use(
 	(error) => {
 		if (error instanceof UnAuthenticatedException) {
 			redirectToLogin()
+			throw new UnAuthenticatedException()
 		}
 	},
 )

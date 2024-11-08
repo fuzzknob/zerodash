@@ -7,6 +7,10 @@ import { fetchProfile } from './user_service'
 export const userProvider = atom<UserModel>()
 
 export async function getUser() {
-	const user = await fetchProfile()
-	store.set(userProvider, () => user)
+	try {
+		const user = await fetchProfile()
+		store.set(userProvider, () => user)
+	} catch (_) {
+		// ignoring error
+	}
 }

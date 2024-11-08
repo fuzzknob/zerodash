@@ -7,3 +7,7 @@ export async function loginWithToken(token: string) {
 		},
 	})
 }
+
+export async function logout() {
+	await request.get('/auth/logout')
+}

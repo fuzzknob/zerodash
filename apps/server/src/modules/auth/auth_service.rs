@@ -156,6 +156,15 @@ impl AuthService {
         user.ok_or(Error::DatabaseQueryError)
     }
 
+    pub async fn delete_session_by_token(&self, token: String) -> Result<()> {
+        self.db
+            .query("DELETE type::table($table) WHERE token=$session_token")
+            .bind(("table", SessionModel::TABLE_NAME))
+            .bind(("session_token", token))
+            .await?;
+        Ok(())
+    }
+
     async fn create_session(&self, user_id: Id) -> Result<SessionModel> {
         let expiration = chrono::Utc::now() + chrono::Duration::days(30);
         let session: Option<SessionModel> = self
