@@ -24,7 +24,7 @@ const ResetPassword = () => {
 
 	return (
 		<div className="flex w-[350px] flex-col">
-			<div className="mb-10 self-center">
+			<div className="self-center mb-10">
 				<Logo />
 			</div>
 			{!hasSent ? (
@@ -35,8 +35,8 @@ const ResetPassword = () => {
 						setSent(true)
 					})}
 				>
-					<h4 className="font-semibold text-2xl">Reset your password</h4>
-					<p className="mb-3 text-gray-600 text-sm">
+					<h4 className="text-2xl font-semibold">Reset your password</h4>
+					<p className="mb-3 text-sm text-gray-600">
 						We'll send you a reset password link for your account if it exists
 					</p>
 					<TextInput className="mb-8" placeholder="Enter your email address" />
@@ -47,7 +47,7 @@ const ResetPassword = () => {
 					We've sent you a reset link check your inbox to reset your password
 				</div>
 			)}
-			<div className="mt-4 self-center text-sm">
+			<div className="self-center mt-4 text-sm">
 				<Link className="text-blue-700" href="/login">
 					Go back to Login
 				</Link>

@@ -5,6 +5,7 @@ import { RootLayout } from './layouts/RootLayout'
 import { HomeScreen } from './screens/home/HomeScreen'
 import { Callback } from './screens/auth/Callback'
 import { Logout } from './screens/auth/Logout'
+import { DashboardLayout } from './layouts/DashboardLayout'
 
 export const router = createBrowserRouter([
 	{
@@ -13,7 +14,13 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				path: '',
-				element: <HomeScreen />,
+				element: <DashboardLayout />,
+				children: [
+					{
+						path: '',
+						element: <HomeScreen />,
+					},
+				],
 			},
 		],
 	},
