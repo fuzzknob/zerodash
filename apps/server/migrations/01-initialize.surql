@@ -58,18 +58,6 @@ DEFINE FIELD space ON boards TYPE record<spaces>;
 DEFINE FIELD created_at ON boards TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
 
--- ---------------------------------
--- -- TABLE: boards
--- ---------------------------------
--- DEFINE TABLE OVERWRITE boards TYPE NORMAL SCHEMAFULL;
--- DEFINE FIELD name ON boards TYPE string;
--- DEFINE FIELD description ON boards TYPE option<string>;
--- DEFINE FIELD icon ON boards TYPE option<string>;
--- DEFINE FIELD primary ON boards TYPE bool DEFAULT false;
--- DEFINE FIELD space ON boards TYPE record<spaces>;
--- DEFINE FIELD created_at ON boards TYPE datetime DEFAULT time::now();
--- DEFINE FIELD updated_at ON boards TYPE datetime VALUE time::now();
-
 ---------------------------------
 -- TABLE: task_states
 ---------------------------------
@@ -128,7 +116,7 @@ DEFINE FIELD updated_at ON tasks TYPE datetime VALUE time::now();
 ---------------------------------
 -- TABLE: users_spaces
 ---------------------------------
-DEFINE TABLE OVERWRITE users_spaces TYPE RELATION  FROM users TO spaces SCHEMAFULL;
+DEFINE TABLE OVERWRITE users_spaces TYPE RELATION FROM users TO spaces SCHEMAFULL;
 DEFINE FIELD user_role ON users_spaces TYPE "OWNER" | "EDITOR" | "GUEST";
 DEFINE FIELD created_at ON users_spaces TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON users_spaces TYPE datetime VALUE time::now();

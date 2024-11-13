@@ -2,7 +2,9 @@ use super::{
     dto::CreateSpaceDTO,
     model::{SpaceModel, UserSpaceModel},
 };
-use crate::modules::users::model::UserModel;
+use crate::modules::{
+    spaces::serializers::get_spaces_serializer::GetSpaceSerializer, users::model::UserModel,
+};
 use lunarus::prelude::*;
 
 pub struct SpaceService {
@@ -44,5 +46,15 @@ impl SpaceService {
             user: user.id.to_string(),
         })
         .await
+    }
+
+    pub async fn get_spaces(&self, user_id: String) -> Result<Vec<GetSpaceSerializer>> {
+        let spaces: Vec<GetSpaceSerializer> = self
+            .db
+            .query("SELECT *, (SELECT * FROM boards where space = $parent.id) as boards FROM (type::record($user))->users_spaces->spaces;")
+            .bind(("user", format!("{}:{}", UserModel::TABLE_NAME, user_id)))
+            .await?
+            .take(0)?;
+        Ok(spaces)
     }
 }

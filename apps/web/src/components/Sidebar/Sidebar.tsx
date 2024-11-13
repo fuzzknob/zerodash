@@ -1,12 +1,15 @@
 import { ActionIcon } from '@mantine/core'
 import { clsx } from 'clsx'
+import { useAtom } from 'jotai'
 import {
 	// HiBars3,
 	HiOutlineCalendarDays,
 	HiOutlineHome,
 	HiPlus,
 } from 'react-icons/hi2'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+
+import { spacesProvider } from '@/modules/spaces'
 
 import Logo from '../Logo'
 import { Profile } from './Profile'
@@ -14,21 +17,18 @@ import { Space } from './Space'
 
 type SidebarItemProps = {
 	to: string
-	active?: boolean
 	icon: React.ReactNode
 	children: React.ReactNode
 }
 
-const SidebarItem = ({
-	to,
-	icon,
-	children,
-	active = false,
-}: SidebarItemProps) => {
+const SidebarItem = ({ to, icon, children }: SidebarItemProps) => {
+	const { pathname } = useLocation()
+	const active = pathname === to
 	const classes = clsx(
 		active && 'bg-slate-100',
 		'flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-slate-200',
 	)
+
 	return (
 		<Link to={to} className={classes}>
 			{icon}
@@ -38,6 +38,8 @@ const SidebarItem = ({
 }
 
 export const Sidebar = () => {
+	const [spaces] = useAtom(spacesProvider)
+
 	return (
 		<div className="flex h-full flex-col rounded-xl bg-slate-300 px-3 py-4">
 			<div className="flex items-center justify-between px-2">
@@ -61,7 +63,9 @@ export const Sidebar = () => {
 				</ActionIcon>
 			</div>
 			<div className="flex flex-1 flex-col gap-2 overflow-y-auto">
-				<Space initialExpanded />
+				{spaces?.map((space) => (
+					<Space key={space.id} space={space} initialExpanded={space.primary} />
+				))}
 			</div>
 			<Profile />
 		</div>

@@ -2,10 +2,11 @@ import { createBrowserRouter } from 'react-router-dom'
 
 import { RootLayout } from './layouts/RootLayout'
 
-import { HomeScreen } from './screens/home/HomeScreen'
+import { DashboardLayout } from './layouts/DashboardLayout'
 import { Callback } from './screens/auth/Callback'
 import { Logout } from './screens/auth/Logout'
-import { DashboardLayout } from './layouts/DashboardLayout'
+import { CalendarScreen } from './screens/calendar/CalendarScreen'
+import { HomeScreen } from './screens/home/HomeScreen'
 
 export const router = createBrowserRouter([
 	{
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
 					{
 						path: '',
 						element: <HomeScreen />,
+					},
+					{
+						path: 'calendar',
+						element: <CalendarScreen />,
 					},
 				],
 			},
