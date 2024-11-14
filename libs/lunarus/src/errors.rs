@@ -15,6 +15,9 @@ pub enum Error {
     #[error("Unauthenticated")]
     Unauthenticated,
 
+    #[error("Unauthorized")]
+    Unauthorized,
+
     #[error("internal server error")]
     InternalServerError,
 
@@ -86,6 +89,10 @@ impl IntoResponse for Error {
             ),
             Error::Unauthenticated => (
                 StatusCode::UNAUTHORIZED,
+                Json(json!({ "message": self.to_string() })),
+            ),
+            Error::Unauthorized => (
+                StatusCode::FORBIDDEN,
                 Json(json!({ "message": self.to_string() })),
             ),
             Error::ValidationError(validation_error) => {
