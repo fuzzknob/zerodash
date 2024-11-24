@@ -4980,6 +4980,7 @@ dependencies = [
  "cookie",
  "garde",
  "lunarus",
+ "rand",
  "rand_chacha",
  "regex",
  "serde",

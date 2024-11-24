@@ -54,6 +54,9 @@ pub enum Error {
     #[error("{0}")]
     EmailSendError(String),
 
+    #[error("{0}")]
+    ValidationError(String),
+
     // Third party errors
     #[error(transparent)]
     SerdeError(#[from] serde_json::Error),
@@ -65,7 +68,7 @@ pub enum Error {
     DbError(#[from] surrealdb::Error),
 
     #[error(transparent)]
-    ValidationError(#[from] garde::Report),
+    GardeValidationError(#[from] garde::Report),
 
     #[error(transparent)]
     AxumFormRejection(#[from] rejection::JsonRejection),
@@ -95,7 +98,10 @@ impl IntoResponse for Error {
                 StatusCode::FORBIDDEN,
                 Json(json!({ "message": self.to_string() })),
             ),
-            Error::ValidationError(validation_error) => {
+            Error::ValidationError(message) => {
+                (StatusCode::BAD_REQUEST, Json(json!({"message": message})))
+            }
+            Error::GardeValidationError(validation_error) => {
                 let mut errors = HashMap::<String, Vec<String>>::new();
                 for (path, error) in validation_error.iter() {
                     let key = path.to_string();

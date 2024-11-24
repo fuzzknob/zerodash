@@ -3,7 +3,7 @@ import { RouterProvider } from 'react-router-dom'
 
 import { router } from './router'
 
-import './index.css'
+import './styles/index.css'
 
 function initialize() {
 	const root = document.getElementById('root')

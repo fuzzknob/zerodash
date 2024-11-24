@@ -1,13 +1,13 @@
 'use client'
-import { z } from 'zod'
-import { zodResolver } from 'mantine-form-zod-resolver'
 import { Button, PasswordInput, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
+import { zodResolver } from 'mantine-form-zod-resolver'
 import Link from 'next/link'
+import { z } from 'zod'
 
-import { AppException, ValidationException } from '@zerodash/web-core'
 import { login } from '@/modules/auth/auth_service'
+import { AppException, ValidationException } from '@zerodash/web-core'
 
 import Logo from '@/components/Logo'
 import { useState } from 'react'
@@ -58,7 +58,7 @@ const LoginPage = () => {
 			})}
 			className="flex w-[350px] flex-col"
 		>
-			<div className="self-center mb-12">
+			<div className="mb-12 self-center">
 				<Logo />
 			</div>
 			<div className="flex flex-col gap-6">
@@ -72,7 +72,7 @@ const LoginPage = () => {
 				/>
 			</div>
 			<Link
-				className="self-end mt-1 mb-4 text-sm text-blue-700"
+				className="mt-1 mb-4 self-end text-blue-700 text-sm"
 				href="/reset-password"
 			>
 				Forget password?
@@ -80,7 +80,7 @@ const LoginPage = () => {
 			<Button type="submit" loading={isSubmitting} fullWidth>
 				Login
 			</Button>
-			<div className="self-center mt-4 text-sm">
+			<div className="mt-4 self-center text-sm">
 				New to Zerodash?{' '}
 				<Link className="text-blue-700" href="/signup">
 					Sign up

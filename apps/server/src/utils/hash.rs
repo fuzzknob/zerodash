@@ -3,11 +3,9 @@ use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, SaltString},
     Argon2, PasswordVerifier,
 };
-use base64::{engine, Engine};
-use rand_chacha::{
-    rand_core::{RngCore, SeedableRng},
-    ChaCha8Rng,
-};
+use rand::Rng;
+use rand::{distributions::Alphanumeric, SeedableRng};
+use rand_chacha::ChaCha12Rng;
 
 pub fn hash_password(password: String) -> String {
     let salt = SaltString::generate(&mut OsRng);
@@ -28,10 +26,12 @@ pub fn verify_password(password: &str, hashed_password: &str) -> bool {
         .is_ok()
 }
 
-pub fn get_unique_random_hash() -> String {
-    let mut rng = OsRng::default();
-    let mut random = ChaCha8Rng::seed_from_u64(rng.next_u64());
-    let random = random.next_u64();
-    let encoded = engine::general_purpose::STANDARD.encode(random.to_string());
-    encoded
+pub fn get_unique_random_hash(size: usize) -> String {
+    let rng = ChaCha12Rng::from_entropy();
+    let random_str: String = rng
+        .sample_iter(Alphanumeric)
+        .take(size)
+        .map(char::from)
+        .collect();
+    random_str
 }

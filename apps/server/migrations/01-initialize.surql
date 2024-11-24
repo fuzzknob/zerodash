@@ -43,9 +43,11 @@ DEFINE TABLE OVERWRITE spaces TYPE NORMAL SCHEMAFULL;
 DEFINE FIELD name ON spaces TYPE string;
 DEFINE FIELD description ON spaces TYPE option<string>;
 DEFINE FIELD icon ON spaces TYPE option<string>;
+DEFINE FIELD slug ON spaces TYPE string;
 DEFINE FIELD primary ON spaces TYPE bool DEFAULT false;
 DEFINE FIELD created_at ON spaces TYPE datetime DEFAULT time::now();
 DEFINE FIELD updated_at ON spaces TYPE datetime VALUE time::now();
+DEFINE INDEX OVERWRITE slugIndex ON TABLE spaces FIELDS slug UNIQUE;
 
 ---------------------------------
 -- TABLE: boards

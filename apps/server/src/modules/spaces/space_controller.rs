@@ -20,7 +20,13 @@ pub async fn create(
     Json(new_space): Json<CreateSpaceDTO>,
 ) -> Result<Response> {
     new_space.validate()?;
-    let space = SpaceService::new(db)
+    let space_service = SpaceService::new(db);
+    if new_space.slug.is_some() {
+        space_service
+            .validate_slug(new_space.slug.clone().unwrap(), new_space.name.clone())
+            .await?;
+    }
+    let space = space_service
         .create_space(new_space, user.id.to_string())
         .await?;
     res::builder().status(StatusCode::CREATED).json(space)
@@ -34,6 +40,19 @@ pub async fn update(
 ) -> Result<Response> {
     space_update.validate()?;
     let space_service = SpaceService::new(db);
+    if space_update.name.is_none() && space_update.slug.is_some() {
+        return Err(Error::ValidationError(
+            "Cannot update slug if name is empty".to_string(),
+        ));
+    }
+    if space_update.slug.is_some() {
+        space_service
+            .validate_slug(
+                space_update.slug.clone().unwrap(),
+                space_update.name.clone().unwrap(),
+            )
+            .await?;
+    }
     let can_edit = space_service
         .can_user_edit(&id, &user.id.to_string())
         .await?;

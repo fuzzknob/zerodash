@@ -5,7 +5,9 @@ use super::{
 use crate::modules::{
     spaces::serializers::get_spaces_serializer::GetSpaceSerializer, users::model::UserModel,
 };
+use crate::utils::hash;
 use lunarus::prelude::*;
+use regex::Regex;
 
 pub struct SpaceService {
     db: Db,
@@ -31,18 +33,20 @@ impl SpaceService {
         new_space: CreateSpaceDTO,
         user: String,
     ) -> Result<SpaceModel> {
+        let slug = new_space.slug.unwrap_or(create_slug(&new_space.name));
         let result: Option<SpaceModel> = self
             .db
             .query("
                 BEGIN;
-                    LET $result = (CREATE type::table($space_table) SET name = $name, description = $description, icon = $icon, primary = $primary);
+                    LET $result = (CREATE type::table($space_table) SET name = $name, slug = $slug, description = $description, icon = $icon, primary = $primary);
                     RELATE (type::record($user))->(type::table($relation_table))->(type::record($result[0].id)) SET user_role = $role;
                     RETURN $result[0];
                 COMMIT;
             ")
             .bind(("space_table", SpaceModel::TABLE_NAME))
             .bind(("relation_table", UserSpaceModel::TABLE_NAME))
-            .bind(("name", new_space.name))
+            .bind(("name", new_space.name.clone()))
+            .bind(("slug", slug))
             .bind(("description", new_space.description))
             .bind(("icon", new_space.icon))
             .bind(("primary", new_space.primary))
@@ -60,13 +64,9 @@ impl SpaceService {
     ) -> Result<SpaceModel> {
         let space: Option<SpaceModel> = self
             .db
-            .query("UPDATE type::record($space) SET name = $name, description = $description, icon = $icon;")
-            .bind(("space", format!("spaces:{space_id}")))
-            .bind(("name", space_update.name))
-            .bind(("description", space_update.description))
-            .bind(("icon", space_update.icon))
-            .await?
-            .take(0)?;
+            .update((SpaceModel::TABLE_NAME, space_id))
+            .merge(space_update)
+            .await?;
         space.ok_or(Error::DatabaseQueryError)
     }
 
@@ -86,6 +86,7 @@ impl SpaceService {
                 description: None,
                 icon: Some("home".to_string()),
                 primary: Some(true),
+                slug: None,
             },
             user.id.to_string(),
         )
@@ -131,6 +132,49 @@ impl SpaceService {
         };
         Ok(role)
     }
+
+    pub async fn validate_slug(&self, slug: String, name: String) -> Result<()> {
+        if !verify_slug_integrity(&slug, &name) {
+            return Err(Error::ValidationError("slug error".to_string()));
+        }
+        let result: Option<Record> = self
+            .db
+            .query("SELECT id FROM spaces WHERE slug = $slug")
+            .bind(("slug", slug))
+            .await?
+            .take(0)?;
+        if result.is_some() {
+            Err(Error::ValidationError("slug error".to_string()))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+fn verify_slug_integrity(slug: &str, text: &str) -> bool {
+    let text_slug = create_slug(text);
+    println!("{} = {}", slug, text_slug);
+    let regex = Regex::new(r"(?m)-[a-zA-Z0-9]{5}$").unwrap();
+    // trimming hash
+    let slug = regex.replace(slug, "");
+    let text_slug = regex.replace(&text_slug, "");
+    println!("{} = {}", slug, text_slug);
+    slug == text_slug
+}
+
+fn create_slug(text: &str) -> String {
+    let parser_rg = Regex::new("[^a-zA-Z0-9 ]+").unwrap();
+    let name = parser_rg
+        .replace_all(text.trim(), "")
+        .to_lowercase()
+        .replace(" ", "-");
+    let name = if !name.is_empty() {
+        name
+    } else {
+        "untitled".to_string()
+    };
+    let random_hash = hash::get_unique_random_hash(5);
+    format!("{name}-{random_hash}")
 }
 
 pub enum UserSpaceRole {

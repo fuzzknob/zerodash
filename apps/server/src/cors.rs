@@ -1,6 +1,7 @@
 use axum::{
     http::header::{ACCEPT, CONTENT_TYPE},
     http::HeaderValue,
+    http::Method,
     Router,
 };
 use lunarus::{prelude::AppContext, utils::get_required_env};
@@ -15,6 +16,13 @@ pub fn cors_plugin(_: AppContext, router: Router<AppContext>) -> Router<AppConte
     ];
     let cors_layer = CorsLayer::new()
         .allow_origin(origins)
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+        ])
         .allow_headers([CONTENT_TYPE, ACCEPT])
         .allow_credentials(true);
     router.layer(cors_layer)

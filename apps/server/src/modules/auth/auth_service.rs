@@ -74,7 +74,7 @@ impl AuthService {
             .db
             .query("CREATE type::table($table) set token = type::string($exchange_token), user = type::thing($user_id), expiration = $expiration")
             .bind(("table", ExchangeTokenModel::TABLE_NAME))
-            .bind(("exchange_token", hash::get_unique_random_hash()))
+            .bind(("exchange_token", hash::get_unique_random_hash(50)))
             .bind(("user_id", format!("{}:{}", UserModel::TABLE_NAME, user.id.to_string())))
             .bind(("expiration", Datetime::from(expiration)))
             .await?
@@ -171,7 +171,7 @@ impl AuthService {
             .db
             .query("CREATE type::table($table) set token = type::string($session_token), user = type::thing($user_id), expiration = $expiration")
             .bind(("table", SessionModel::TABLE_NAME))
-            .bind(("session_token", hash::get_unique_random_hash()))
+            .bind(("session_token", hash::get_unique_random_hash(50)))
             .bind(("user_id", format!("{}:{}", UserModel::TABLE_NAME, user_id.to_string())))
             .bind(("expiration", Datetime::from(expiration)))
             .await?

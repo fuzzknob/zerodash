@@ -16,6 +16,7 @@ surrealdb = { workspace = true }
 chrono = { workspace = true }
 axum-extra = { workspace = true, features = ["cookie-signed"] }
 cookie = { workspace = true }
+rand = { workspace = true }
 rand_chacha = { workspace = true, features = ["default"] }
 tower-http = { workspace = true, features = ["cors"] }
 argon2 = { version = "0.5.3" }

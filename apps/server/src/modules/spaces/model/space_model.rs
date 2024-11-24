@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SpaceModel {
     pub id: Id,
+    pub slug: String,
     pub name: String,
     pub description: Option<String>,
     pub icon: Option<String>,

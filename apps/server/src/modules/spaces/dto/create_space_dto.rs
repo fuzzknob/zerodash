@@ -7,6 +7,8 @@ use serde_with_macros::skip_serializing_none;
 pub struct CreateSpaceDTO {
     #[garde(length(min = 1))]
     pub name: String,
+    #[garde(length(min = 5))]
+    pub slug: Option<String>,
     #[garde(length(min = 1))]
     pub description: Option<String>,
     #[garde(length(min = 5))]

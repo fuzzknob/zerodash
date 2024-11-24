@@ -1,25 +1,21 @@
-import { Menu } from '@mantine/core'
-import { useAtom } from 'jotai'
-import {
-	HiArrowLeftStartOnRectangle,
-	HiEllipsisVertical,
-	HiOutlineUser,
-} from 'react-icons/hi2'
-import { Link } from 'react-router-dom'
+import {Menu} from '@mantine/core'
+import {useAtom} from 'jotai'
+import {HiArrowLeftStartOnRectangle, HiEllipsisVertical, HiOutlineUser,} from 'react-icons/hi2'
+import {Link} from 'react-router-dom'
 
-import { userProvider } from '@/modules/user'
-import { ProfilePicture } from '../ProfilePicture'
+import {userProvider} from '@/modules/user'
+import {ProfilePicture} from '../ProfilePicture'
 
 export const Profile = () => {
 	const [user] = useAtom(userProvider)
 	if (user == null) return <div />
 
 	return (
-		<Menu width={170} position="right-end">
+		<Menu width={170} position="right-end" radius="md">
 			<Menu.Target>
 				<button
 					type="button"
-					className="flex items-center justify-between rounded-xl p-2 hover:bg-slate-200"
+					className="flex items-center justify-between rounded-xl p-2 hover:bg-slate-100"
 				>
 					<div className="flex items-center gap-2">
 						<ProfilePicture profileUrl={user.profile} />
