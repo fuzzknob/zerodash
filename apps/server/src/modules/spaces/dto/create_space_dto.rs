@@ -11,7 +11,7 @@ pub struct CreateSpaceDTO {
     pub slug: Option<String>,
     #[garde(length(min = 1))]
     pub description: Option<String>,
-    #[garde(length(min = 5))]
+    #[garde(length(min = 2))]
     pub icon: Option<String>,
     #[garde(skip)]
     pub primary: Option<bool>,

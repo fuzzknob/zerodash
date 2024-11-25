@@ -53,12 +53,9 @@ pub async fn update(
             )
             .await?;
     }
-    let can_edit = space_service
+    space_service
         .can_user_edit(&id, &user.id.to_string())
         .await?;
-    if !can_edit {
-        return Err(Error::Unauthorized);
-    }
     let space = space_service.update_space(&id, space_update).await?;
     res::json(space)
 }
@@ -69,12 +66,9 @@ pub async fn delete(
     user: UserModel,
 ) -> Result<Response> {
     let space_service = SpaceService::new(db);
-    let can_delete = space_service
+    space_service
         .can_user_delete(&id, &user.id.to_string())
         .await?;
-    if !can_delete {
-        return Err(Error::Unauthorized);
-    }
     space_service.delete_space(&id).await?;
     res::message("Successfully deleted space")
 }

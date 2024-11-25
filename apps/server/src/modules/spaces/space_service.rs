@@ -1,6 +1,6 @@
 use super::{
     dto::{CreateSpaceDTO, UpdateSpaceDTO},
-    model::{SpaceModel, UserSpaceModel},
+    model::{SpaceModel, UserSpaceModel, UserSpaceRole},
 };
 use crate::modules::{
     spaces::serializers::get_spaces_serializer::GetSpaceSerializer, users::model::UserModel,
@@ -71,10 +71,9 @@ impl SpaceService {
     }
 
     pub async fn delete_space(&self, space_id: &str) -> Result<()> {
-        let space_id = format!("spaces:{space_id}");
         self.db
             .query("DELETE type::record($space)")
-            .bind(("space", space_id))
+            .bind(("space", format!("spaces:{space_id}")))
             .await?;
         Ok(())
     }
@@ -93,16 +92,20 @@ impl SpaceService {
         .await
     }
 
-    pub async fn can_user_edit(&self, space_id: &str, user_id: &str) -> Result<bool> {
+    pub async fn can_user_edit(&self, space_id: &str, user_id: &str) -> Result<()> {
         let role = self.get_user_role(space_id, user_id).await?;
         let can_edit = matches!(role, UserSpaceRole::Owner | UserSpaceRole::Editor);
-        Ok(can_edit)
+        if can_edit {
+            Ok(())
+        } else {
+            Err(Error::Unauthorized)
+        }
     }
 
-    pub async fn can_user_delete(&self, space_id: &str, user_id: &str) -> Result<bool> {
+    pub async fn can_user_delete(&self, space_id: &str, user_id: &str) -> Result<()> {
         let role = self.get_user_role(space_id, user_id).await?;
         if !matches!(role, UserSpaceRole::Owner) {
-            return Ok(false);
+            return Err(Error::Unauthorized);
         }
         // checking if the space is primary
         let record: Option<Record> = self
@@ -111,7 +114,11 @@ impl SpaceService {
             .bind(("space", format!("spaces:{space_id}")))
             .await?
             .take(0)?;
-        Ok(record.is_some())
+        if record.is_some() {
+            Ok(())
+        } else { 
+            Err(Error::Unauthorized)
+        }
     }
 
     pub async fn get_user_role(&self, space_id: &str, user_id: &str) -> Result<UserSpaceRole> {
@@ -125,12 +132,7 @@ impl SpaceService {
         let Some(user_space) = user_space else {
             return Ok(UserSpaceRole::None);
         };
-        let role = match user_space.user_role.as_str() {
-            "OWNER" => UserSpaceRole::Owner,
-            "EDITOR" => UserSpaceRole::Editor,
-            _ => UserSpaceRole::Guest,
-        };
-        Ok(role)
+        Ok(UserSpaceRole::from_txt(&user_space.user_role))
     }
 
     pub async fn validate_slug(&self, slug: String, name: String) -> Result<()> {
@@ -175,11 +177,4 @@ fn create_slug(text: &str) -> String {
     };
     let random_hash = hash::get_unique_random_hash(5);
     format!("{name}-{random_hash}")
-}
-
-pub enum UserSpaceRole {
-    Owner,
-    Editor,
-    Guest,
-    None,
 }

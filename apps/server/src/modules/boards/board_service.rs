@@ -1,9 +1,8 @@
+use crate::modules::spaces::model::{SpaceModel, UserSpaceModel, UserSpaceRole};
 use lunarus::prelude::*;
 
-use crate::modules::spaces::model::SpaceModel;
-
 use super::{
-    dto::CreateBoardDTO,
+    dto::{CreateBoardDTO, UpdateBoardDto},
     model::{BoardModel, TaskStatesModel},
 };
 
@@ -36,6 +35,27 @@ impl BoardService {
         Ok(result.unwrap())
     }
 
+    pub async fn update_board(
+        &self,
+        board_id: String,
+        board_update: UpdateBoardDto,
+    ) -> Result<BoardModel> {
+        let board: Option<BoardModel> = self
+            .db
+            .update((BoardModel::TABLE_NAME, board_id))
+            .merge(board_update)
+            .await?;
+        board.ok_or(Error::DatabaseQueryError)
+    }
+
+    pub async fn delete_board(&self, board_id: String) -> Result<()> {
+        self.db
+            .query("DELETE type::record($board)")
+            .bind(("board", format!("boards:{board_id}")))
+            .await?;
+        Ok(())
+    }
+
     pub async fn create_default_board(&self, space_id: String) -> Result<BoardModel> {
         self.create_board(CreateBoardDTO {
             name: "Personal".to_string(),
@@ -44,5 +64,24 @@ impl BoardService {
             space: space_id,
         })
         .await
+    }
+
+    pub async fn check_user_permission(&self, board_id: &str, user_id: &str) -> Result<()> {
+        let user_space:Option<UserSpaceModel> = self.db.query(
+                "SELECT * FROM (type::record($board)).space<-users_spaces WHERE in = type::record($user);"
+            )
+            .bind(("board", format!("boards:{board_id}")))
+            .bind(("user", format!("users:{user_id}")))
+            .await?
+            .take(0)?;
+        let Some(user_space) = user_space else {
+            return Err(Error::Unauthorized);
+        };
+        let user_role = UserSpaceRole::from_txt(&user_space.user_role);
+        if matches!(user_role, UserSpaceRole::Owner | UserSpaceRole::Editor) {
+            Ok(())
+        } else {
+            Err(Error::Unauthorized)
+        }
     }
 }
